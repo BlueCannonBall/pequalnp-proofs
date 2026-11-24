@@ -53,7 +53,11 @@ theorem PEqualNP.Outside.R_meta_2024_1
         exact hik ▸ hbound _ horig k (List.mem_cons_self ..)
       · exact hbound g (unchanged g (.inr h)) i hi
     have same (bits : List Bool) : C.eval bits = D.eval bits := by
-      simp only [Circuit.eval, Circuit.wires, C, D, List.foldl_append, List.foldl_cons]
+      let step (w : List Bool) (g : Gate) :=
+        w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]
+      change ((before ++ (⟨.not, k :: rest⟩ : Gate) :: after).foldl step bits).getD out false =
+        ((before ++ (⟨.not, [k]⟩ : Gate) :: after).foldl step bits).getD out false
+      simp only [List.foldl_append, List.foldl_cons]
       rfl
     simp_rw [same]
     by_cases hk : k = 9
